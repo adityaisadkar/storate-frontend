@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  // Use the Render URL for production, localhost for development
+  baseURL: import.meta.env.VITE_API_URL || 'https://storate-backend.onrender.com/api',
 });
 
 // Add a request interceptor to include JWT token
