@@ -9,12 +9,17 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
       const { data } = await API.post('/auth/login', { email, password });
       login(data);
     } catch (err) {
+      setLoading(false);
       setError(err.response?.data?.message || 'Invalid credentials');
     }
   };
@@ -52,8 +57,13 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '16px' }}>
-            Login
+          <button 
+            type="submit" 
+            className="btn-primary" 
+            style={{ width: '100%', marginTop: '16px' }}
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

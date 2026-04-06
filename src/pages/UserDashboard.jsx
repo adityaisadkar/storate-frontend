@@ -6,7 +6,7 @@ import { Search, Store, ArrowUpDown, CheckCircle } from 'lucide-react';
 
 const UserDashboard = () => {
   const [stores, setStores] = useState([]);
-  const [filters, setFilters] = useState({ search: '', sortBy: 'name', order: 'ASC' });
+  const [loadingStoreId, setLoadingStoreId] = useState(null);
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
@@ -21,12 +21,17 @@ const UserDashboard = () => {
   };
 
   const handleRate = async (storeId, rating) => {
+    setLoadingStoreId(storeId);
     try {
       await API.post('/user/rate', { storeId, rating });
       setSuccess('Rating submitted successfully!');
       setTimeout(() => setSuccess(''), 3000);
       fetchStores();
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+    } finally {
+      setLoadingStoreId(null);
+    }
   };
 
   const handleSort = (field) => {
@@ -96,6 +101,7 @@ const UserDashboard = () => {
                       rating={s.ratings?.[0]?.rating || 0} 
                       editable={true} 
                       onRate={(r) => handleRate(s.id, r)}
+                      disabled={loadingStoreId === s.id}
                     />
                   </div>
                 </div>

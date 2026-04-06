@@ -4,17 +4,24 @@ import Navbar from '../components/Navbar';
 import { Users, ShoppingBag, Star, Search, PlusCircle, ArrowUpDown, X, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const Modal = ({ title, onClose, onSubmit, children, modalError }) => (
+const Modal = ({ title, onClose, onSubmit, children, modalError, loading }) => (
   <div className="modal-overlay">
     <div className="modal-content card glass">
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
         <h3>{title}</h3>
-        <button onClick={onClose} style={{ background: 'transparent' }}><X size={20} /></button>
+        <button onClick={onClose} style={{ background: 'transparent' }} disabled={loading}><X size={20} /></button>
       </div>
       {modalError && <div style={{ color: 'var(--danger)', marginBottom: '16px', fontSize: '14px' }}>{modalError}</div>}
       <form onSubmit={onSubmit}>
         {children}
-        <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '20px' }}>Create {title.split(' ')[1]}</button>
+        <button 
+          type="submit" 
+          className="btn-primary" 
+          style={{ width: '100%', marginTop: '20px' }} 
+          disabled={loading}
+        >
+          {loading ? 'Creating...' : `Create ${title.split(' ')[1]}`}
+        </button>
       </form>
     </div>
   </div>
@@ -32,8 +39,9 @@ const AdminDashboard = () => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', address: '', role: 'user' });
-  const [newStore, setNewStore] = useState({ name: '', email: '', address: '', ownerId: '' });
+  const [newStore, setStoreData] = useState({ name: '', email: '', address: '', ownerId: '' });
   const [modalError, setModalError] = useState('');
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -64,6 +72,8 @@ const AdminDashboard = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
+    setModalLoading(true);
+    setModalError('');
     try {
       await API.post('/admin/add-user', newUser);
       setShowUserModal(false);
@@ -72,19 +82,25 @@ const AdminDashboard = () => {
       fetchStats();
     } catch (err) {
       setModalError(err.response?.data?.message || 'Failed to create user');
+    } finally {
+      setModalLoading(false);
     }
   };
 
   const handleCreateStore = async (e) => {
     e.preventDefault();
+    setModalLoading(true);
+    setModalError('');
     try {
       await API.post('/admin/add-store', newStore);
       setShowStoreModal(false);
-      setNewStore({ name: '', email: '', address: '', ownerId: '' });
+      setStoreData({ name: '', email: '', address: '', ownerId: '' });
       fetchStores();
       fetchStats();
     } catch (err) {
       setModalError(err.response?.data?.message || 'Failed to create store');
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -224,6 +240,7 @@ const AdminDashboard = () => {
           onClose={() => setShowUserModal(false)}
           onSubmit={handleCreateUser}
           modalError={modalError}
+          loading={modalLoading}
         >
           <div className="form-group">
             <label className="label">Full Name</label>
@@ -268,6 +285,7 @@ const AdminDashboard = () => {
           onClose={() => setShowStoreModal(false)}
           onSubmit={handleCreateStore}
           modalError={modalError}
+          loading={modalLoading}
         >
           <div className="form-group">
             <label className="label">Store Name</label>
