@@ -39,7 +39,7 @@ const AdminDashboard = () => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', address: '', role: 'user' });
-  const [newStore, setStoreData] = useState({ name: '', email: '', address: '', ownerId: '' });
+  const [newStore, setNewStore] = useState({ name: '', email: '', address: '', ownerId: '' });
   const [modalError, setModalError] = useState('');
   const [modalLoading, setModalLoading] = useState(false);
 
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
     try {
       await API.post('/admin/add-store', newStore);
       setShowStoreModal(false);
-      setStoreData({ name: '', email: '', address: '', ownerId: '' });
+      setNewStore({ name: '', email: '', address: '', ownerId: '' });
       fetchStores();
       fetchStats();
     } catch (err) {

@@ -8,6 +8,7 @@ const UserDashboard = () => {
   const [stores, setStores] = useState([]);
   const [loadingStoreId, setLoadingStoreId] = useState(null);
   const [success, setSuccess] = useState('');
+  const [filters, setFilters] = useState({ search: '', sortBy: 'name', order: 'ASC' });
 
   useEffect(() => {
     fetchStores();
